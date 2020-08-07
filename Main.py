@@ -11,7 +11,11 @@ def get_html(url, params = None):
     return req
 
 def get_pages(html):
-    pass
+    soup = BeautifulSoup(html, 'html.parser')
+    stop = soup.find('span', class_='ty-pagination__selected')
+    return stop
+
+get_pages(get_html(URL).text)
 
 
 def get_content(html):
@@ -31,23 +35,19 @@ def get_content(html):
                 'price' : 'цену уточняйте',
                 'href' : item.find('a', 'product-title').get('href'),
                 })
-    for prod in products:
-        print(prod)
     return products
 
 
 
-def parse():
-    html = get_html(URL)
-    if html.status_code == 200:
-        get_content(html.text)
-    else:
-        print('error')
+def main():
+    page = 0
+    item = []
+    while get_pages(get_html(URL, params={'page': page}).text) != None:
+        item.append(get_content(get_html(URL, params={'page': page}).text))
+        page += 1
+        print(f'Парсим страницу{page}')
+    print(len(item))
 
 
-parse()
-
-
-
-# if __name__ == '__main__':
-# 	main()
+if __name__ == '__main__':
+    main()
